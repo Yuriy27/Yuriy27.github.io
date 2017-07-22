@@ -63,13 +63,18 @@
 								#calendar > .YYYY > .M > .MM > .D:first-child[data-d="6"] { margin-left: calc(((100% + 6px) / 7) * 6 - 6px); }
 								#calendar > .YYYY > .M > .MM > .D > .num { position: absolute; font-size: 11px; top: 0px; left: 4px; }
 								#calendar > .YYYY > .M > .MM > .D:hover > .num { font-weight: 700; }
+                                
 		</style>
 	</head>
 	<body>
 	<div id="calendar"></div>
 	<div id="event-details" class="ui modal">
-	    <div id="event-header" class="header">Header</div>
-	    <div id="event-description" class="content">Description</div>
+	    <i class="close icon"></i>
+	    <div id="event-name" class="header">Name</div>
+	    <div class="content">
+	        <p id="event-date"></p>
+	        <p id="event-description"></p>
+	    </div>
 	</div>
 		<script>
 			/* Calendar */
@@ -118,7 +123,6 @@
 					this.element.querySelectorAll('.D').forEach((element) => element.addEventListener('click', (event) => { this.callback(event.target.getAttribute('data-date')); }));
 
 
-
                     $('.event-mark').popup();
 				    //$('.event-mark').on('click', function() {
 				   //     $('#event-details').modal('show');
@@ -129,29 +133,28 @@
             var events = [
                 {
                     date: "2017-07-20",
-                    eventId: 0,
                     event: "Come up with a homework idea",
                     description: "Well, yeah, you know. You've got to engage the audience"
                 },
                 {
                     date: "2017-07-19",
-                    eventId: 0,
                     event: "Bla bla blo",
-                    description: "Well, yeah, you know. You've got to engage the audience"
+                    description: "Bla bla bla blo blo blo ko ko ko"
                 },
                 {
                     date: "2017-07-14",
-                    eventId: 0,
                     event: "Write homework bsa",
-                    description: "Well, yeah, you know. You've got to engage the audience"
+                    description: "I should do this work quality as much as possible"
                 }]; //"2017-02-08", "2017-02-04", "2017-02-06"
 
             var callback = function(date) {
                 var ev = this.data.filter(function(obj) {
                     return obj.date == date;
                 })[0];
-                $("#event-header").text(ev.event);
+                $("#event-name").text(ev.event);
+                $("#event-date").text(ev.date);
                 $("#event-description").text(ev.description);
+
                 $("#event-details").modal('show');
             }
 
