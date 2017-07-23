@@ -68,16 +68,16 @@
 	</head>
 	<body>
 	<div id="calendar"></div>
-	<div id="event-details" class="ui modal scrolling small">
+	<div id="event-details" class="ui modal tiny">
 	    <i class="close icon red"></i>
-	    <div id="event-name" class="header"></div>
+	    <div id="event-name" class="header" style="color: green"></div>
 	    <div class="content">
 	        <div class="content">
-	            <p id="event-date"></p>
+	            <p id="event-date" style="color: blue"></p>
 	            <p id="event-description"></p>
 	        </div>
 	        
-	        <div id="participants" class="ui content"></div>
+	        <div id="participants" class="ui content scrolling"></div>
 	    </div>
 	</div>
 		<script>
@@ -112,7 +112,7 @@
                             + _.range(2, d1.daysInMonth() + 1)
                             .reduce(function (MM, d) {   
                                 var currDate = year + '-' + ('00' + (m + 1)).slice(-2) + '-' + ('00' + d).slice(-2);
-                                return MM += '<a href="#" class="' + (year == moment().year() && m == moment().month() && d == moment().date() ? 'active ' : '') + 'D" data-date="' + currDate + '" draggable="false">' + '<span class="num">' + d + '</span>' + (dt.indexOf(currDate) == -1 ? '' : '<i data-content="' + et[currDate] + '" data-date="' + currDate + '" class="circle icon tiny red event-mark"></i></a>'); }, '') + '</div>');
+                                return MM += '<a href="#" class="' + (year == moment().year() && m == moment().month() && d == moment().date() ? 'active ' : '') + 'D" data-date="' + currDate + '" draggable="false">' + '<span class="num">' + d + '</span>' + (dt.indexOf(currDate) == -1 ? '' : '<i data-content="' + et[currDate] + '"  class="circle icon tiny red event-mark"></i></a>'); }, '') + '</div>');
 						w = Math.max(w, Math.ceil((d1.day() + d1.daysInMonth()) / 7));
 						if (m == 3 || m == 7 || m == 11) {
 							y += '<div class="M" data-w="' + w + '">' + t.join('</div><div class="M" data-w="' + w + '">') + '</div>';
@@ -129,8 +129,9 @@
 				        element.addEventListener('click', (event) => {
 				            var element = event.target;
 				            while (element) {
-				                if (element.hasAttribute('data-date')) {
-				                    this.callback(element.getAttribute('data-date'));
+                                if (element.hasAttribute('data-date')) {
+                                    
+				                    this.callback(element.getAttribute('data-date'), element);
 				                    break;
 				                } else {
 				                    element = element.parentElement;
@@ -148,19 +149,19 @@
 
 			var events = [
 			    {
-			        date: "2017-07-20",
+			        date: "2017-07-25",
 			        event: "Come up with a homework idea",
 			        description: "Well, yeah, you know. You've got to engage the audience"
 			    },
 			    {
-			        date: "2017-07-19",
+			        date: "2017-07-26",
 			        event: "Bla bla blo",
 			        description: "Bla bla bla blo blo blo ko ko ko"
 			    },
 			    {
-			        date: "2017-07-14",
-			        event: "Write homework bsa",
-			        description: "I should do this work quality as much as possible",
+			        date: "2017-07-29",
+			        event: "Crazy IT Party",
+			        description: "detailed description of crazy it party",
 			        participants: [
 			            {
 			                name: "Volodymyr Stoyko",
@@ -169,22 +170,33 @@
 			            },
 			            {
 			                name: "Gabe Newell",
-			                avatar: "https://3dnews.ru/assets/external/illustrations/2013/09/17/761073/GabeNewell.jpg",
+                            avatar: "http://metagearsolid.org/wp-content/uploads/2011/08/blog_newell1.jpg",
                             url: "https://www.facebook.com/ValveGabeNewell/"
-                        }] 
+                        },
+			            {
+			                name: "Another Volodymyr Stoyko",
+			                url: "https://www.facebook.com/corest",
+			                avatar: "https://scontent-cdt1-1.xx.fbcdn.net/v/t1.0-9/19959082_10210721389766187_6789533543778955899_n.jpg?oh=204032e8f826891d02c566e5cdcdf384&oe=59C40BCC"
+			            },
+			            {
+			                name: "Another Gabe Newell",
+                            avatar: "http://metagearsolid.org/wp-content/uploads/2011/08/blog_newell1.jpg",
+			                url: "https://www.facebook.com/ValveGabeNewell/"
+			            }] 
                 }]; //"2017-02-08", "2017-02-04", "2017-02-06"
 
-            var callback = function(date) {
+            var callback = function(date, element) {
                 var ev = this.data.filter(function(obj) {
                     return obj.date == date;
                 })[0];
                 $("#event-name").text(ev.event);
                 $("#event-date").text(ev.date);
                 $("#event-description").text(ev.description);
+                element.style.background = "lightgray";
                 if (ev.participants != undefined) {
                     var partHtml = '';
                     ev.participants.forEach(function(p) {
-                        partHtml += '<div class="divider ui"></div><div class="image content"><div class="ui small image"><img src="' +
+                        partHtml += '<div class="divider ui"></div><div class="image content"><div class="ui small rounded image"><img src="' +
                             p.avatar +
                             '"></div><div class="description"><p>' +
                             p.name +
@@ -200,7 +212,10 @@
                 }
 
                 $("#event-details").modal({
-                    inverted: true
+                    inverted: true,
+                    onHidden: function() {
+                        element.style.background = "white";
+                    }
                 }).modal('show');
             }
 
