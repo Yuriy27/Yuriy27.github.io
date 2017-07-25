@@ -63,6 +63,11 @@
 								#calendar > .YYYY > .M > .MM > .D:first-child[data-d="6"] { margin-left: calc(((100% + 6px) / 7) * 6 - 6px); }
 								#calendar > .YYYY > .M > .MM > .D > .num { position: absolute; font-size: 11px; top: 0px; left: 4px; }
 								#calendar > .YYYY > .M > .MM > .D:hover > .num { font-weight: 700; }
+
+           
+            .event-div { padding-left: 10px; }
+            #event-date, #event-description { font-weight: bold; font-size: 15px;}
+            #event-todo { font-size: 15px;}
                                 
 		</style>
 	</head>
@@ -75,9 +80,15 @@
 	        <div class="content">
 	            <p id="event-date" style="color: blue"></p>
 	            <p id="event-description"></p>
+                <p id="event-todo"></p>
 	        </div>
 	        
 	        <div id="participants" class="ui content scrolling"></div>
+	    </div>
+	    <div class="actions">
+	        <div class="ui positive right button">
+	            Okay, okay
+	        </div>
 	    </div>
 	</div>
 		<script>
@@ -91,6 +102,15 @@
 					moment.locale(locale);
 					this.show(moment().year());
                 }
+
+                getEvents(eventDate) {
+                    var res = '';
+                    this.data.filter((ev) => ev['date'] === eventDate).forEach(function(event) {
+                        //res += '<i data-content="' + event['event'] + '" eventId="' + event['eventId'] + '" class="circle icon small red event-mark"></i>';
+                        res += '<div class="ui mini circular red empty label event event-mark" eventId="' + event.eventId + '" data-content="' + event.event + '"></div>';
+                    });
+                    return res;
+                }
 			
 				show(year) {
 					this.year = year;
@@ -100,19 +120,20 @@
                         var dt = [];
 					    var et = {};
 					    this.data.forEach(function(value) {
-                            dt.push(value['date']);
-					        et[value['date']] = value["event"];
+                            //dt.push(value['date']);
+					        //et[value['date']].push(value["event"]);
                         });
-					    
+					    //var getEvents = this.getEvents;
                         t.push('<div class="MMMM">'
                             + moment.months()[m] + '</div>' + n + '<div class="MM"><a href="#" class="'
                             + (year == moment().year() && m == moment().month() && 1 == moment().date() ? 'active ' : '')
                             + 'D" data-d="' + d1.day() + '" data-date="' + year + '-' + ('00' + (m + 1)).slice(-2)
                             + '-01" draggable="false"><span class="num">1</span><div class="content"></div></a>'
                             + _.range(2, d1.daysInMonth() + 1)
-                            .reduce(function (MM, d) {   
+                            .reduce((MM, d) => {   
                                 var currDate = year + '-' + ('00' + (m + 1)).slice(-2) + '-' + ('00' + d).slice(-2);
-                                return MM += '<a href="#" class="' + (year == moment().year() && m == moment().month() && d == moment().date() ? 'active ' : '') + 'D" data-date="' + currDate + '" draggable="false">' + '<span class="num">' + d + '</span>' + (dt.indexOf(currDate) == -1 ? '' : '<i data-content="' + et[currDate] + '"  class="circle icon tiny red event-mark"></i></a>'); }, '') + '</div>');
+                                return MM += '<a href="#" class="' + (year == moment().year() && m == moment().month() && d == moment().date() ? 'active ' : '') + 'D" data-date="' + currDate + '" draggable="false">' + '<span class="num">' + d + '</span><div class="content event-div">' + this.getEvents(currDate) + '</div></a>';
+                            }, '') + '</div>');
 						w = Math.max(w, Math.ceil((d1.day() + d1.daysInMonth()) / 7));
 						if (m == 3 || m == 7 || m == 11) {
 							y += '<div class="M" data-w="' + w + '">' + t.join('</div><div class="M" data-w="' + w + '">') + '</div>';
@@ -125,43 +146,57 @@
 					this.element.querySelector('.prev').addEventListener('click', () => { this.show(--this.year); });
 					this.element.querySelector('.next').addEventListener('click', () => { this.show(++this.year); });
 					//this.element.querySelectorAll('.D').forEach((element) => element.addEventListener('click', (event) => { this.callback(event.target.getAttribute('data-date')); }));
-				    this.element.querySelectorAll('.D').forEach((element) => {
-				        element.addEventListener('click', (event) => {
-				            var element = event.target;
-				            while (element) {
-                                if (element.hasAttribute('data-date')) {
+				    //this.element.querySelectorAll('.D').forEach((element) => {
+				    //    element.addEventListener('click', (event) => {
+				    //        var element = event.target;
+				    //        while (element) {
+        //                        if (element.hasAttribute('data-date')) {
                                     
-				                    this.callback(element.getAttribute('data-date'), element);
-				                    break;
-				                } else {
-				                    element = element.parentElement;
-				                }
-				            }
-				        });
-				    });
+				    //                this.callback(element.getAttribute('data-date'), element);
+				    //                break;
+				    //            } else {
+				    //                element = element.parentElement;
+				    //            }
+				    //        }
+				    //    });
+				    //});
 
                     $('.event-mark').popup();
 				    //$('.event-mark').on('click', function() {
 				   //     $('#event-details').modal('show');
 				   // });
+				    this.element.querySelectorAll('.event-mark').forEach((element) => element.addEventListener('click', (event) => { this.callback(event.target.getAttribute('eventId')); }));
 				}
             }
 
 			var events = [
 			    {
 			        date: "2017-07-25",
+			        eventId: 0,
 			        event: "Come up with a homework idea",
-			        description: "Well, yeah, you know. You've got to engage the audience"
+			        description: "Well, yeah, you know. You've got to engage the audience",
+			        todo: ['todo1', 'todo2', 'todo3']
 			    },
+			    {
+                    date: "2017-07-26",
+                    eventId: 1,
+			        event: "Bla bla blo",
+                    description: "Bla bla bla blo blo blo ko ko ko",
+                    todo: ['todo1', 'todo2']
+                },
 			    {
 			        date: "2017-07-26",
+			        eventId: 4,
 			        event: "Bla bla blo",
-			        description: "Bla bla bla blo blo blo ko ko ko"
+                    description: "Bla bla bla blo blo blo ko ko ko",
+			        todo: ['todo1', 'todo2', 'todo3']
 			    },
 			    {
-			        date: "2017-07-29",
+                    date: "2017-07-29",
+                    eventId: 2,
 			        event: "Crazy IT Party",
-			        description: "detailed description of crazy it party",
+                    description: "detailed description of crazy it party",
+                    todo: ['todo1', 'todo2', 'todo3', 'todo4'],
 			        participants: [
 			            {
 			                name: "Volodymyr Stoyko",
@@ -174,9 +209,9 @@
                             url: "https://www.facebook.com/ValveGabeNewell/"
                         },
 			            {
-			                name: "Another Volodymyr Stoyko",
-			                url: "https://www.facebook.com/corest",
-			                avatar: "https://scontent-cdt1-1.xx.fbcdn.net/v/t1.0-9/19959082_10210721389766187_6789533543778955899_n.jpg?oh=204032e8f826891d02c566e5cdcdf384&oe=59C40BCC"
+			                name: "Another Volodymyr Stoyko"
+			                //url: "https://www.facebook.com/corest"
+			                //avatar: "https://scontent-cdt1-1.xx.fbcdn.net/v/t1.0-9/19959082_10210721389766187_6789533543778955899_n.jpg?oh=204032e8f826891d02c566e5cdcdf384&oe=59C40BCC"
 			            },
 			            {
 			                name: "Another Gabe Newell",
@@ -185,26 +220,27 @@
 			            }] 
                 }]; //"2017-02-08", "2017-02-04", "2017-02-06"
 
-            var callback = function(date, element) {
+            var callback = function(eventId) {
                 var ev = this.data.filter(function(obj) {
-                    return obj.date == date;
+                    return obj.eventId == eventId;
                 })[0];
+                let todo = '<ul>';
+                ev.todo.forEach((task) => { todo += '<li>' + task + '</li>' });
+                todo += '</ul>';
                 $("#event-name").text(ev.event);
                 $("#event-date").text(ev.date);
                 $("#event-description").text(ev.description);
-                element.style.background = "lightgray";
+                $("#event-todo").html(todo);
                 if (ev.participants != undefined) {
                     var partHtml = '';
-                    ev.participants.forEach(function(p) {
+                    ev.participants.forEach(function (p) {
+                        let avatar = p.avatar ? p.avatar : "assets/default.png";
+                        let url = p.url ? '<p><a target="_blank" href="' + p.url + '">' + p.url + '</a></p>' : '';
                         partHtml += '<div class="divider ui"></div><div class="image content"><div class="ui small rounded image"><img src="' +
-                            p.avatar +
+                            avatar +
                             '"></div><div class="description"><p>' +
                             p.name +
-                            '</p><p><a target="_blank" href="' +
-                            p.url +
-                            '">' +
-                            p.url +
-                            '</a></p></div></div>';
+                            '</p></div></div>' + url;
                     });
                     $("#participants").html(partHtml);
                 } else {
@@ -212,10 +248,7 @@
                 }
 
                 $("#event-details").modal({
-                    inverted: true,
-                    onHidden: function() {
-                        element.style.background = "white";
-                    }
+                    inverted: true
                 }).modal('show');
             }
 
